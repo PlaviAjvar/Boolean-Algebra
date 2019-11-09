@@ -33,17 +33,17 @@ In the case of conjuction, it's always optimal to write it as was done above, be
 
 # Algorithm #
 
-Let's now describe the algorithm for generating the optimal solution. The input is given in a disjunctive form:
+Let's now describe the algorithm for generating the optimal solution. The input is given in a disjunctive form:\
 y = (A_1 A_2 ... A_n) v (B_1 B_2 ... B_m) v ... v (Z_1 Z_2 ... Z_p)\
 We will split the problem into two separate problems:
 1. minimizing the number of NANDs in a conjuction
-2. minimizing the number of NANDs in the disjunctive form\
+2. minimizing the number of NANDs in the disjunctive form
 
 The reason we can do this is that negation always covers an entire expression, and can never cover only part of it. In other words, we can only negate a segment of the expression containing entire conjuctions separated by disjunctions.\
-This means that whenever we apply double negation to a segment containing more than one conjuction, we have to transform the disjunction into NAND, since we don't have access to any of the conjuctions(they are in parentheses). We will only be able to negate conjuctions when there is only one conjuction in the segment we are double negating.\
+This means that whenever we apply double negation to a segment containing more than one conjuction, we have to transform the disjunction into NAND, since we don't have access to any of the conjuctions(they are in parentheses). We will only be able to negate conjuctions when there is only one conjuction in the segment we are double negating.
 
 The first part of the problem is to solve the problem for conjuctions only. Afterwards, we know the optimal NAND expression for each of the conjuctions.\
-In the disjunctive form, we can look at the conjuctions as indivisible blocks where each of them has a certain cost, represented by the number of NANDs used to represent it minimally. Taking these costs into consideration, we will try to optimize the sequence of negations over disjunctions to minimize the number of NANDs.\
+In the disjunctive form, we can look at the conjuctions as indivisible blocks where each of them has a certain cost, represented by the number of NANDs used to represent it minimally. Taking these costs into consideration, we will try to optimize the sequence of negations over disjunctions to minimize the number of NANDs.
 
 # First part #
 
