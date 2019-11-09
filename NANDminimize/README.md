@@ -24,12 +24,12 @@ AB = (AB)'' = (A nand B)' = (A nand B) nand (A nand B) \
 AvB = (AvB)'' = (A'B')' = A' nand B' 
 
 In case of disjunction it is not always optimal to write A' = A nand A. In the case where A is a conjuction, A' gives us the NAND form immediatly, where as A needs a double negation. Therefore, we would use more than 4 times the operations if we didn't utilize the negation. \
-In the case where A is a disjunction negating it as A' = A nand A is optimal. Either approach(negating first or negating last) will yield the same form: \
+In the case where A is a disjunction negating it as A' = A nand A is optimal. Either approach(negating first or negating last) will yield the same form: 
 
 (AvB)' = ((AvB)')'' = (A'B')'' = (A' nand B')' \
-(AvB)' = ((AvB)'')' = ((A'B')')' = (A' nand B')' \
+(AvB)' = ((AvB)'')' = ((A'B')')' = (A' nand B')' 
 
-In the case of conjuction, it's always optimal to write it as was done above, because there is no negation to take advantage of(the negation is over an expression containing NAND). \
+In the case of conjuction, it's always optimal to write it as was done above, because there is no negation to take advantage of(the negation is over an expression containing NAND). 
 
 # Algorithm #
 
