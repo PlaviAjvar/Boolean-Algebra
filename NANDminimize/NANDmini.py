@@ -75,7 +75,9 @@ def expression_disj(backtrack, conj_nand):
     # utility function for recursivelly generating expression
     def expression_util(low_idx, high_idx):
         if low_idx == high_idx:
-            return conj_nand[low_idx]
+            conj_len = len(conj_nand[low_idx])
+            # we take half of the conjuction expression, since it is negated
+            return conj_nand[low_idx][0:conj_len//2]
         # AvB = (AvB)'' = (A'B')' = (A nand A) nand (B nand B)
         left_expr = expression_util(low_idx, backtrack[low_idx][high_idx])
         right_expr = expression_util(backtrack[low_idx][high_idx] + 1, high_idx)
@@ -86,6 +88,12 @@ def expression_disj(backtrack, conj_nand):
 
         first_half = "(" + left_expr + "\u22BC" + left_expr + ")"  # (A nand A)
         second_half = "(" + right_expr + "\u22BC" + right_expr + ")"  # (B nand B)
+        # if either the left or right part is a pure conjuction, we shouldn't double negate it
+        # instead we should use the negation applied to it to our advantage
+        if low_idx == backtrack[low_idx][high_idx]:
+            first_half = "(" +  left_expr + ")"
+        if high_idx == backtrack[low_idx][high_idx] + 1:
+            second_half = "(" + right_expr + ")"
         full_expr = first_half + "\u22BC" + second_half
         return full_expr
 
@@ -100,7 +108,7 @@ def disjunction_nand(conj_cost, conj_nand):
     backtrack = [[-1] * num_var for i in range(num_var)]  # store optimal splitting point of each segment
     # base cases
     for i in range(num_var):
-        min_nand[i][i] = conj_cost[i]  # minimal cost of conjuction in disjunctive form
+        min_nand[i][i] = conj_cost[i] / 2  # minimal cost of conjuction in disjunctive form
         backtrack[i][i] = i
 
     minimize_util(0, num_var - 1, min_nand, backtrack)
@@ -116,7 +124,12 @@ def min_nand_form(dnf):
     conj_nand = [conjunction_nand(conj) for conj in dnf]
     conj_cost = [len(nand_ex) for nand_ex in conj_nand]
     # find minimum equivalent disjunctive form taking into consideration costs of conjuctions
-    nand_form = disjunction_nand(conj_cost, conj_nand)
+    if len(dnf) > 1:
+        nand_form = disjunction_nand(conj_cost, conj_nand)
+    elif len(dnf) == 1:  # just one conjuction
+        nand_form = conj_nand[0]
+    else:  # empty expression
+        nand_form = ""
     return nand_form
 
 
@@ -157,9 +170,9 @@ def main():
     expr = input()
     dnf = parse_dnf(expr)
     min_form = min_nand_form(dnf)
-    print("The minimal form using only NANDs is:\ny =", min_form)
+    print("The minimal form using only NANDs is:\n\ny =", min_form)
     nand_count = min_form.count('\u22BC');
-    print("\n\nThe number of NANDs in the optimal solution is", nand_count)
+    print("\nThe number of NANDs in the optimal solution is", nand_count)
 
 
 if __name__ == "__main__":
