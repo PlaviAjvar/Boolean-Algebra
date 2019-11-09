@@ -47,53 +47,57 @@ In the disjunctive form, we can look at the conjuctions as indivisible blocks wh
 
 # First part #
 
-Let's first describe how to minimize the number of NANDs in conjuctions. Let's say our conjuction is given by:
-y = A_1 A_2 ... A_n\
-Let's define a function F_kon(i,j) which gives us the minimal number of NANDs needed to represent a segment [i,j] of the expression. In order to transform A[i...j] into a NAND form, we need to apply double negation over it, and split the expression around one of the conjuctions.\
+Let's first describe how to minimize the number of NANDs in conjuctions. Let's say our conjuction is given by:\
+y = A_1 A_2 ... A_n
+
+Let's define a function F_kon(i,j) which gives us the minimal number of NANDs needed to represent a segment [i,j] of the expression. In order to transform A[i...j] into a NAND form, we need to apply double negation over it, and split the expression around one of the conjuctions.
+
 We can choose(because of the associativity of conjuction) which conjuction we will split by. Let's say we split by the conjuction between A_k and A_(k+1). We group the first k arguments and last n-k arguments, and then we double negate the k-th conjuction. We can now write a recursive relation for the optimal solution using this particular split:
 
-F_kon(i,j)|k = 2\*F_kon(i,k) + 2\*F_kon(k+1,j) + 3\
+F_kon(i,j)|k = 2\*F_kon(i,k) + 2\*F_kon(k+1,j) + 3
 
 We are using the following property:
 
-AB = (AB)'' = (A nand B)' = (A nand B) nand (A nand B)\
+AB = (AB)'' = (A nand B)' = (A nand B) nand (A nand B)
 
 F_kon(i,k) represents the optimal solution for A, F_kon(k+1,j) represents the optimal solution for B, and we need 3 more NANDs to calculate the above expression.\
 Now it's easy to modify this in order to find the optimal solution. We simply try every possible k, split over it, and calculate the optimal solution using that split. Then we minimize over all these. Ergo:
 
-F_kon(i,j) = min{F_kon(i,j)|k} = min{2\*F_kon(i,k) + 2\*F_kon(k+1,j) + 3}, for k = i,i+1,...,j-1\
+F_kon(i,j) = min{F_kon(i,j)|k} = min{2\*F_kon(i,k) + 2\*F_kon(k+1,j) + 3}, for k = i,i+1,...,j-1
 
 The base case is given by:
 
 F_kon(i,i) = 0, if A[i] isn't negated\
-F_kon(i,i) = 1, otherwise\
+F_kon(i,i) = 1, otherwise
 
 The second case exists in the situation where a negated argument is given in the input, and A' = A nand A.\
-All we need to do now is write the recursion and memoize it, and we have a dynamic programing solution for our problem. Since we are generally interested in both the number of NANDs in the optimal sequence, and the sequence itself, we will add another table into our program which will be used to backtrack the solution.\
+All we need to do now is write the recursion and memoize it, and we have a dynamic programing solution for our problem. Since we are generally interested in both the number of NANDs in the optimal sequence, and the sequence itself, we will add another table into our program which will be used to backtrack the solution.
 
-Let's analyze the complexity of the above algorithm since there are O(n^2) states, and each of them takes O(n) time to execute, the algorithm runs in O(n^3) time and O(n^2) space. 
+Let's analyze the complexity of the above algorithm. Since there are O(n^2) states, and each of them takes O(n) time to execute, the algorithm runs in O(n^3) time and O(n^2) space. 
 
 # Second part #
 
 Now that we've described how to minimie the conjuctions, let's describe the method of minimizing the disjunctive form. It can be written as:
-y = A_1 v A_2 v ... A_m\
+
+y = A_1 v A_2 v ... A_m
+
 where each of the A_i is a conjuction of arbitrarily many inputs. The approach for minimizing this is similar to the one before. First, note that:
 
-AvB = (AvB)'' = (A'B')' = A' nand B'\
+AvB = (AvB)'' = (A'B')' = A' nand B'
 
 Based on this define a function F_dis(i,j) which is the minimal number of NANDs which form an equivalent expression to the one on segment [i,j]. We will again apply double negation to the expression and let's again assume this is done around some index k. We can write:
 
 F_dis(i,j)|k = 2\*F_dis(i,k) + 2\*F_dis(k+1,j) + 3, if k != i and k != j-1\
 F_dis(i,j)|k = F_dis(i,k) + 2\*F_dis(k+1,j) + 2, if k = i\
-F_dis(i,j)|k = 2\*F_dis(i,k) + F_dis(k+1,j) + 2, if k = j-1\
+F_dis(i,j)|k = 2\*F_dis(i,k) + F_dis(k+1,j) + 2, if k = j-1
 
 Like in the previous part, the optimal solution is given by:
 
-F_dis(i,j) = min{F_dis(i,j)|k}, for k = i,i+1,...,j-1\
+F_dis(i,j) = min{F_dis(i,j)|k}, for k = i,i+1,...,j-1
 
 The base case reduces to the previous problem and is given by:
 
-F_dis(i,i) = F_kon(1, len(A_i))\
+F_dis(i,i) = F_kon(1, len(A_i))
 
 Again, we memoize the recursion and add a backtracking table for reconstructing the solution, and the problem is solved. The second part uses the first one only in the base case, and there is no additional computation since the lookup of the first table is O(1). Since the algorithm is nearly the same, the asymptotic complexity of the second part is the same as the first one O(n^3) time and O(n^2) space.
 
