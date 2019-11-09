@@ -33,8 +33,10 @@ In the case of conjuction, it's always optimal to write it as was done above, be
 
 # Algorithm #
 
-Let's now describe the algorithm for generating the optimal solution. The input is given in a disjunctive form:\
-y = (A_1 A_2 ... A_n) v (B_1 B_2 ... B_m) v ... v (Z_1 Z_2 ... Z_p)\
+Let's now describe the algorithm for generating the optimal solution. The input is given in a disjunctive form:
+
+y = (A_1 A_2 ... A_n) v (B_1 B_2 ... B_m) v ... v (Z_1 Z_2 ... Z_p)
+
 We will split the problem into two separate problems:
 1. minimizing the number of NANDs in a conjuction
 2. minimizing the number of NANDs in the disjunctive form
@@ -47,7 +49,8 @@ In the disjunctive form, we can look at the conjuctions as indivisible blocks wh
 
 # First part #
 
-Let's first describe how to minimize the number of NANDs in conjuctions. Let's say our conjuction is given by:\
+Let's first describe how to minimize the number of NANDs in conjuctions. Let's say our conjuction is given by:
+
 y = A_1 A_2 ... A_n
 
 Let's define a function F_kon(i,j) which gives us the minimal number of NANDs needed to represent a segment [i,j] of the expression. In order to transform A[i...j] into a NAND form, we need to apply double negation over it, and split the expression around one of the conjuctions.
