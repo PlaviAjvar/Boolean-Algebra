@@ -1,7 +1,9 @@
 # NAND minimization
 
-The problem in question is to represent a disjunctive form, i.e. a logic expression of the form:\
-y = (A_1 A_2 ... A_n) v (B_1 B_2 ... B_m) v ... \
+The problem in question is to represent a disjunctive form, i.e. a logic expression of the form:
+
+y = (A_1 A_2 ... A_n) v (B_1 B_2 ... B_m) v ... 
+
 using an equivalent logic expression, which uses only 2-port NANDs and the number of NANDs is minimized.
 
 The types of operations normally used for this conversion are: 
