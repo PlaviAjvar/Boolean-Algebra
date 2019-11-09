@@ -93,8 +93,10 @@ AvB = (AvB)'' = (A'B')' = A' nand B'
 Based on this define a function F_dis(i,j) which is the minimal number of NANDs which form an equivalent expression to the one on segment [i,j]. We will again apply double negation to the expression and let's again assume this is done around some index k. We can write:
 
 F_dis(i,j)|k = 2\*F_dis(i,k) + 2\*F_dis(k+1,j) + 3, if k != i and k != j-1\
-F_dis(i,j)|k = F_dis(i,k) + 2\*F_dis(k+1,j) + 2, if k = i\
-F_dis(i,j)|k = 2\*F_dis(i,k) + F_dis(k+1,j) + 2, if k = j-1
+F_dis(i,j)|k = F_dis(i,k)/2 + 2\*F_dis(k+1,j) + 2, if k = i\
+F_dis(i,j)|k = 2\*F_dis(i,k) + F_dis(k+1,j)/2 + 2, if k = j-1
+
+The reason for the (1/2) factor is that the negation A' actually makes it easier to calculate the conjuctive equivalent, as there is no need to do double negation. When doing double negation, in the last step we need to apply NAND of the expression to itself, and here there is no need to do so. The division rounds down, which is intended as we need to remove the second operand and the NAND in the middle(which is equivalent to rounding down).
 
 Like in the previous part, the optimal solution is given by:
 
