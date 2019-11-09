@@ -2,12 +2,12 @@
 
 The problem in question is to represent a disjunctive form, i.e. a logic expression of the form:\
 y = (A_1 A_2 ... A_n) v (B_1 B_2 ... B_m) v ... \
-using an equivalent logic expression, which uses only 2-port NANDs and the number of NANDs is minimized. \
+using an equivalent logic expression, which uses only 2-port NANDs and the number of NANDs is minimized.
 
-The types of operations normally used for this conversion are: \
-1. De Morgan's law: (AvB)' = A'B' \
-2. Negation using NAND: A' = (A nand A) \
-3. Double negation: A = A'' \
+The types of operations normally used for this conversion are: 
+1. De Morgan's law: (AvB)' = A'B' 
+2. Negation using NAND: A' = (A nand A) 
+3. Double negation: A = A'' 
 
 Utilizing these 3 operations one can convert a disjunctive form into a form using NANDs, and the sequence of operations determines the number of NANDs in the end. We can illustrate an example of how this is done on a simple form: \
 
