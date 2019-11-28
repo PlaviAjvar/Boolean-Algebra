@@ -95,6 +95,7 @@ Based on this define a function F_dis(i,j) which is the minimal number of NANDs 
 F_dis(i,j)|k = 2\*F_dis(i,k) + 2\*F_dis(k+1,j) + 3, if k != i and k != j-1\
 F_dis(i,j)|k = F_dis(i,k) + 2\*F_dis(k+1,j) + 2, if k = i\
 F_dis(i,j)|k = 2\*F_dis(i,k) + F_dis(k+1,j) + 2, if k = j-1
+F_dis(i,j)|k = F_dis(i,k) + F_dis(k+1, j) + 1, j = i+1 = k+1
 
 The absence of the factor 2 in the two special cases is due to the fact that we have a conjuction as one of the parameters. It is better in this case not to negate it twice and then again negate it within the expression, but rather use the fact that it is negated to our advantage, gaining a 4 times reduction in length.
 
