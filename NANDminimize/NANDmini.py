@@ -34,7 +34,7 @@ def expression_conj(backtrack, conj):
             if conj[low_idx] > 0:
                 single_var = chr(conj[low_idx])
             else:
-                single_var = "(" + chr(-conj[low_idx]) + "\u22BC" + chr(-conj[low_idx]) + ")"
+                single_var = chr(-conj[low_idx]) + "\u22BC" + chr(-conj[low_idx])
             return single_var
         # AB = (AB)'' = (A nand B)' = (A nand B) nand (A nand B)
         left_expr = expression_util(low_idx, backtrack[low_idx][high_idx])
@@ -74,27 +74,37 @@ def conjunction_nand(conj):
 def expression_disj(backtrack, conj_nand):
     # utility function for recursivelly generating expression
     def expression_util(low_idx, high_idx):
-        if low_idx == high_idx:
-            conj_len = len(conj_nand[low_idx])
-            # we take half of the conjuction expression, since it is negated
-            return conj_nand[low_idx][0:conj_len//2]
+        if low_idx == high_idx: #reduces to conjuction problem
+            return conj_nand[low_idx]
         # AvB = (AvB)'' = (A'B')' = (A nand A) nand (B nand B)
         left_expr = expression_util(low_idx, backtrack[low_idx][high_idx])
         right_expr = expression_util(backtrack[low_idx][high_idx] + 1, high_idx)
-        if len(left_expr) > 1:  # unless the expression is a single letter, put parentheses around it
-            left_expr = "(" + left_expr + ")"
-        if len(right_expr) > 1:
-            right_expr = "(" + right_expr + ")"
+        first_half = "((" + left_expr + ")\u22BC(" + left_expr + "))"  # (A nand A)
+        second_half = "((" + right_expr + ")\u22BC(" + right_expr + "))"  # (B nand B)
 
-        first_half = "(" + left_expr + "\u22BC" + left_expr + ")"  # (A nand A)
-        second_half = "(" + right_expr + "\u22BC" + right_expr + ")"  # (B nand B)
-        # if either the left or right part is a pure conjuction, we shouldn't double negate it
-        # instead we should use the negation applied to it to our advantage
+        # if we have conjuctive form, we can use the negation to our advantage
+        # we have the following cases:
+        # 1. conjuction is one letter - we have to form it's negation A' = A nand A
+        # 2. conjuction is three letters(negation), and therefore (A nand A)' = A
+        # 3. conjuction is of the form A nand A(any case where both halves of A are nonempty)
+        # last case is same as second, except we need to add parentheses in the end
         if low_idx == backtrack[low_idx][high_idx]:
-            first_half = "(" +  left_expr + ")"
+            if len(left_expr) == 1:
+                first_half = "(" + left_expr + "\u22BC" + left_expr + ")"
+            elif len(left_expr) == 3:
+                first_half = left_expr[1]
+            else:
+                first_half = "(" + left_expr[1:len(left_expr)//2 - 1] + ")"
+
         if high_idx == backtrack[low_idx][high_idx] + 1:
-            second_half = "(" + right_expr + ")"
-        full_expr = first_half + "\u22BC" + second_half
+            if len(right_expr) == 1:
+                second_half = "(" + right_expr + "\u22BC" + right_expr + ")"
+            elif len(right_expr) == 3:
+                second_half = right_expr[1]
+            else:
+                second_half = "(" + right_expr[1:len(right_expr)//2 - 1] + ")"
+
+        full_expr = first_half + " \u22BC " + second_half
         return full_expr
 
     return expression_util(0, len(conj_nand) - 1)
@@ -163,6 +173,9 @@ def parse_dnf(dnf_str):
 # 3. implement MDNF with this
 # 4. add tester for equivalency of logic functions
 # 5. draw tree of operations
+# 6. improve scalability
+# 7. edit complexity meassures in README
+# 8. modify for nor
 
 
 def main():
