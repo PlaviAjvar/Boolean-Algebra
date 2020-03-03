@@ -1,0 +1,5 @@
+y = AB'CD' v ABCD v A'B'D v B'C'D v A'BC v BC'D' (MDNF1)
+y = AB'CD' v ABCD v A'B'D v A'C'D v B'C'D v BC'D' (MDNF2)
+
+y = AB'CD v ABC'D v A'B'D' v B'C'D' v A'BC v BCD' (MDNF1')
+y = AB'CD v ABC'D v B'C'D' v A'CD' v A'BC v BCD' (MDNF2')

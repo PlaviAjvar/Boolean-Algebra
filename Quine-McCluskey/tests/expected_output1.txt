@@ -1,0 +1,4 @@
+y = C'D' v BD (MDNF)
+
+y = (B v D')(C' v D) (MKNF)
+

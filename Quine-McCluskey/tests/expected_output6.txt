@@ -1,0 +1,1 @@
+y = ABC' v ACD v A'BC v A'C'D (MDNF)

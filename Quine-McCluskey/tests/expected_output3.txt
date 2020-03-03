@@ -1,0 +1,2 @@
+y = A'vC (MDNF)
+y = A'vC (MKNF)

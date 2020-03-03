@@ -1,0 +1,3 @@
+y = A'C'D v CD' v AB' v AD' (MDNF)
+
+y = (A'vB'vD')(AvCvD)(C'vD') (MKNF)

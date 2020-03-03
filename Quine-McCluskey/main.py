@@ -1,9 +1,12 @@
+import os
+
 # reduce two implicants which we assume are reducible
 def reduce(first_implicant, second_implicant):
-    form, mask = first_implicant
+    form, mask, _ = first_implicant
     # add new reduced bit to mask
     new_mask = mask | (second_implicant[0] - first_implicant[0])
-    return (form, new_mask)
+    is_dont_care = (first_implicant[2] and second_implicant[2])
+    return (form, new_mask, is_dont_care)
 
 # test if two implicants are reducible
 def can_reduce(first_implicant, second_implicant):
@@ -22,13 +25,19 @@ def can_reduce(first_implicant, second_implicant):
 def bitcount(n):
     return bin(n).count("1")
 
-def get_prime_implicants(constituents, num_var):
+def get_prime_implicants(constituents, num_var, dont_care):
     # sort one constituents by their bitcount
     implicant_buckets = [set() for _ in range(num_var+1)]
+    # the third parameter is True if it's a don't care combination
     for constituent in constituents:
-        implicant_buckets[bitcount(constituent)].add((constituent, 0))
+        implicant_buckets[bitcount(constituent)].add((constituent, 0, False))
+    # add don't care combinations
+    for dc_comb in dont_care:
+        implicant_buckets[bitcount(dc_comb)].add((dc_comb, 0, True))
 
     # find all prime implicants
+    # if a prime implicant is obtained by reducing only don't care combinations, don't list it
+    # it's not hard to see it will never be in the optimal solution to the problem
     prime_implicants = []
     while True:
         next_buckets = [set() for _ in range(num_var)]
@@ -54,8 +63,8 @@ def get_prime_implicants(constituents, num_var):
         # all unlabeled implicants are therefore prime implicants
         for bucket_idx, bucket in enumerate(implicant_buckets):
             for implicant_idx, implicant in enumerate(bucket):
-                if not label[bucket_idx][implicant_idx]:
-                    prime_implicants.append(implicant)
+                if not label[bucket_idx][implicant_idx] and implicant[2] != True:
+                    prime_implicants.append(implicant[:-1])
 
         # we terminate if none of the implicants were able to reduce
         if not any_reductions:
@@ -84,14 +93,14 @@ def cover(implicant, constituents):
 
 
 # core method for performing Quine-McCluskey algorithm
-def quine_mccluskey(constituents, num_var):
+def quine_mccluskey(constituents, num_var, dont_care):
         # get number of letters used in implicant
         # conjuctions, disjunctions and negations don't count
         def word_length(implicant):
             return num_var - bitcount(implicant[1])
 
         # get the prime implicants
-        prime_implicants = get_prime_implicants(constituents, num_var)
+        prime_implicants = get_prime_implicants(constituents, num_var, dont_care)
 
         # find minimal set of prime implicants
         # we will use a bitmask dynamic programming approach
@@ -103,6 +112,8 @@ def quine_mccluskey(constituents, num_var):
         num_constituents = len(constituents)
         # minimal_form[i][mask] is the length of the minimal form which uses the first i-1 implicants
         # and implies the constituents covered by mask
+        # for certain implementation reasons, minimal_form[i][mask] is larger than it should be by exactly one
+        # for all non-trivial cases
         minimal_form = [[inf] * 2**num_constituents for _ in range(num_implicants+1)]
         backtrack = [[None] * 2**num_constituents for _ in range(num_implicants+1)]
         # base case
@@ -138,7 +149,7 @@ def quine_mccluskey(constituents, num_var):
                 solution.append(prime_implicants[implicant_idx])
             cur_mask = new_mask
 
-        return solution, minimal_form[num_implicants][2**num_constituents-1]
+        return solution, (minimal_form[num_implicants][2**num_constituents-1])
 
 # utility function for inverting inputs in implicant
 def invert_input(implicant, num_var):
@@ -152,10 +163,15 @@ def invert_inputs(implicants, num_var):
 # invert the one constituents of the expression
 # if K was in the expression, it no longer is
 # if K wasn't in the expression, it now is
-def invert_constituents(one_constituents, num_var):
+# dont cares stay the same
+def invert_constituents(one_constituents, num_var, dont_care):
     in_expr = [False for _ in range(2**num_var)]
     for one_constituent in one_constituents:
         in_expr[one_constituent] = True
+    for dc_comb in dont_care:
+        in_expr[dc_comb] = True
+    # the remaining False entries were zeros in the original function
+    # fill the list with these values
     inverted_list = []
     for one_constituent in range(2**num_var):
         if not in_expr[one_constituent]:
@@ -217,25 +233,47 @@ def string_from_expression(constituents, num_var, is_dnf):
 
 if __name__ == "__main__":
     # input the constituents
-    print("Select input method (standard, file):")
+    print("Select input method (standard, file, test):")
     input_method = input()
     if input_method == "standard":
-        num_var = int(input())
-        one_constituents = list(map(int, input().split()))
+        num_var = int(input("Number of variables:"))
+        one_constituents = list(map(int, input("Input constituent ones:").split()))
+        dont_care = list(map(int, input("Input don't care combinations:").split()))
     elif input_method == "file":
         with open("input.txt", "r") as file:
             file_lines = file.readlines()
         num_var = int(file_lines[0])
         one_constituents = list(map(int, file_lines[1].split()))
+        if len(file_lines) > 2:
+            dont_care = list(map(int, file_lines[2].split()))
+        else:
+            dont_care = []
+    elif input_method == "test":
+        test_number = int(input("Input test number: "))
+        # define file path for tests folder
+        script_dir = os.path.dirname(__file__)
+        rel_path = "tests/test" + str(test_number) + ".txt"
+        abs_file_path = os.path.join(script_dir, rel_path)
+
+        with open(abs_file_path, "r+") as file:
+            file_lines = file.readlines()
+        num_var = int(file_lines[0])
+        one_constituents = list(map(int, file_lines[1].split()))
+        if len(file_lines) > 2:
+            dont_care = list(map(int, file_lines[2].split()))
+        else:
+            dont_care = []
+
+        print("The results of testing on test" + str(test_number) + ":\n")
     else:
         raise Exception("Invalid input method.")
 
     # find the minimal forms using the Quine-McCluskey algoritm
-    minimal_disjunctive, dis_length = quine_mccluskey(one_constituents, num_var)
+    minimal_disjunctive, dis_length = quine_mccluskey(one_constituents, num_var, dont_care)
     # sort the implicants for clarity
     minimal_disjunctive = sorted(minimal_disjunctive)
 
-    minimal_conjuctive, con_length = quine_mccluskey(invert_constituents(one_constituents, num_var), num_var)
+    minimal_conjuctive, con_length = quine_mccluskey(invert_constituents(one_constituents, num_var, dont_care), num_var, dont_care)
     minimal_conjuctive = invert_inputs(minimal_conjuctive, num_var)
     minimal_conjuctive = sorted(minimal_conjuctive)
 
